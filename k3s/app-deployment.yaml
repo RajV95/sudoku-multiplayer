@@ -1,0 +1,63 @@
+apiVersion: v1
+kind: Secret
+metadata:
+  name: sudoku-secrets
+type: Opaque
+stringData:
+  jwt-secret: "change_me_to_a_secure_production_secret_key"
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: sudoku-app-deployment
+  labels:
+    app: sudoku-app
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: sudoku-app
+  template:
+    metadata:
+      labels:
+        app: sudoku-app
+    spec:
+      containers:
+        - name: sudoku-app
+          image: sudoku-multiplayer:latest  # Replace with actual registry image path if publishing
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 3000
+          env:
+            - name: MONGODB_URI
+              value: "mongodb://mongodb-service:27017/sudoku_multiplayer"
+            - name: REDIS_URL
+              value: "redis://redis-service:6379"
+            - name: PORT
+              value: "3000"
+            - name: NODE_ENV
+              value: "production"
+            - name: JWT_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: sudoku-secrets
+                  key: jwt-secret
+          resources:
+            limits:
+              memory: "512Mi"
+              cpu: "500m"
+            requests:
+              memory: "256Mi"
+              cpu: "250m"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: sudoku-app-service
+spec:
+  selector:
+    app: sudoku-app
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 3000
