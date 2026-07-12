@@ -19,7 +19,9 @@
     "react-dom": "19.2.4",
     "redis": "^6.1.0",
     "socket.io": "^4.8.3",
-    "socket.io-client": "^4.8.3"
+    "socket.io-client": "^4.8.3",
+    "ts-node": "^10.9.2",
+    "typescript": "^5"
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4",
@@ -36,8 +38,6 @@
     "eslint-config-next": "16.2.10",
     "jsdom": "^29.1.1",
     "tailwindcss": "^4",
-    "ts-node": "^10.9.2",
-    "typescript": "^5",
     "vitest": "^4.1.10"
   }
 }
