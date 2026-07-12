@@ -24,8 +24,13 @@ export async function getRedisClient(): Promise<RedisClientType> {
   }
 
   if (!cached.promise) {
+    const isTls = REDIS_URL.startsWith('rediss://');
     const client = createClient({
       url: REDIS_URL,
+      socket: isTls ? {
+        tls: true,
+        rejectUnauthorized: false,
+      } : undefined,
     }) as RedisClientType;
 
     client.on('error', (err) => {
