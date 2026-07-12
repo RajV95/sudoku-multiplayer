@@ -1,0 +1,15 @@
+.env
+.env.local
+.env.development
+.env.production
+node_modules
+.next
+out
+.git
+.gitignore
+README.md
+k3s
+vitest.config.ts
+vitest.setup.ts
+docker-compose.yml
+Dockerfile

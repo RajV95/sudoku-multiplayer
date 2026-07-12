@@ -11,7 +11,11 @@
     "test:watch": "vitest"
   },
   "dependencies": {
+    "@types/node": "^20",
+    "@types/react": "^19",
+    "@types/react-dom": "^19",
     "bcryptjs": "^3.0.3",
+    "cookie": "^0.6.0",
     "jsonwebtoken": "^9.0.3",
     "mongoose": "^9.7.4",
     "next": "16.2.10",
@@ -22,10 +26,7 @@
     "socket.io-client": "^4.8.3",
     "ts-node": "^10.9.2",
     "tsconfig-paths": "^4.2.0",
-    "typescript": "^5",
-    "@types/node": "^20",
-    "@types/react": "^19",
-    "@types/react-dom": "^19"
+    "typescript": "^5"
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4",
