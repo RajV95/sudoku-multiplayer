@@ -27,6 +27,10 @@ if (!cached) {
   cached = global.mongooseGlobal = { conn: null, promise: null };
 }
 
+if (!cached) {
+  throw new Error('Mongoose global cache initialization failed');
+}
+
 export async function connectToDatabase() {
   if (cached.conn) {
     return cached.conn;
