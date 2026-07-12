@@ -21,14 +21,10 @@ declare global {
   var mongooseGlobal: GlobalMongoose | undefined;
 }
 
-let cached = global.mongooseGlobal;
+const cached: GlobalMongoose = global.mongooseGlobal || { conn: null, promise: null };
 
-if (!cached) {
-  cached = global.mongooseGlobal = { conn: null, promise: null };
-}
-
-if (!cached) {
-  throw new Error('Mongoose global cache initialization failed');
+if (!global.mongooseGlobal) {
+  global.mongooseGlobal = cached;
 }
 
 export async function connectToDatabase() {

@@ -12,10 +12,10 @@ declare global {
   var redisGlobal: GlobalRedis | undefined;
 }
 
-let cached = global.redisGlobal;
+const cached: GlobalRedis = global.redisGlobal || { client: null, promise: null };
 
-if (!cached) {
-  cached = global.redisGlobal = { client: null, promise: null };
+if (!global.redisGlobal) {
+  global.redisGlobal = cached;
 }
 
 export async function getRedisClient(): Promise<RedisClientType> {
