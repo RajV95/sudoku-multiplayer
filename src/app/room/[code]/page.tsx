@@ -497,6 +497,7 @@ export default function RoomPage({ params }: { params: Promise<{ code: string }>
                           <input
                             type="text"
                             maxLength={1}
+                            inputMode="none"
                             className={`sudoku-input ${isFixed ? 'fixed' : ''} ${isError ? 'error' : ''}`}
                             value={cellVal === 0 ? '' : cellVal}
                             onChange={(e) => handleCellChange(rIdx, cIdx, e.target.value)}
@@ -531,10 +532,68 @@ export default function RoomPage({ params }: { params: Promise<{ code: string }>
               </>
             )
           ) : (
-            <div style={{ padding: '3.5rem 1rem', textAlign: 'center' }}>
-              <h1 style={{ fontSize: '2.5rem', color: 'var(--success)', marginBottom: '1rem', fontWeight: '800' }}>Game Finished!</h1>
-              <p style={{ color: 'var(--text-secondary)', marginBottom: '2.5rem' }}>All players have finished or resigned.</p>
-              <button className="btn btn-primary" onClick={() => router.push('/lobby')}>
+            <div style={{ padding: '1rem 0.5rem', textAlign: 'center' }}>
+              <h1 style={{ fontSize: '2rem', color: 'var(--text-primary)', marginBottom: '0.4rem', fontWeight: '800' }}>🏁 Match Leaderboard</h1>
+              <p style={{ color: 'var(--text-secondary)', marginBottom: '1.5rem', fontSize: '0.95rem' }}>Game over! Here are the final standings:</p>
+              
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem', marginBottom: '2rem', textAlign: 'left' }}>
+                {[...room.players].sort((a, b) => {
+                  if (b.progress !== a.progress) return b.progress - a.progress;
+                  if (a.isFinished && b.isFinished) return (a.completionTime || 0) - (b.completionTime || 0);
+                  return 0;
+                }).map((player, idx) => {
+                  const isUser = player.userId === userId;
+                  const isWinner = idx === 0 && player.isFinished;
+                  return (
+                    <div key={player.userId} style={{
+                      padding: '1rem',
+                      background: isWinner ? 'rgba(16, 185, 129, 0.08)' : isUser ? 'rgba(56, 108, 210, 0.05)' : '#f8fafc',
+                      border: isWinner ? '1.5px solid var(--success)' : isUser ? '1.5px solid var(--primary)' : '1px solid var(--panel-border)',
+                      borderRadius: '12px',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'space-between',
+                      position: 'relative'
+                    }}>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '0.8rem' }}>
+                        <span style={{
+                          fontWeight: '800',
+                          fontSize: '1.2rem',
+                          color: isWinner ? 'var(--success)' : 'var(--text-secondary)',
+                          width: '28px'
+                        }}>
+                          {idx === 0 ? '🏆' : `${idx + 1}.`}
+                        </span>
+                        <div>
+                          <div style={{ fontWeight: '700', fontSize: '1rem', color: 'var(--text-primary)' }}>
+                            {player.username} {isUser && '(You)'}
+                          </div>
+                          <div style={{ fontSize: '0.8rem', color: 'var(--text-secondary)' }}>
+                            Mistakes: {player.mistakes}{room.maxMistakes > 0 ? `/${room.maxMistakes}` : ''}
+                          </div>
+                        </div>
+                      </div>
+                      <div style={{ textAlign: 'right' }}>
+                        <div style={{ fontWeight: '800', fontSize: '1.1rem', color: isWinner ? 'var(--success)' : 'var(--primary)' }}>
+                          {player.progress}%
+                        </div>
+                        {player.isFinished && player.completionTime && (
+                          <div style={{ fontSize: '0.75rem', color: 'var(--text-secondary)' }}>
+                            ⏱️ {player.completionTime}s
+                          </div>
+                        )}
+                        {player.isResigned && !player.isFinished && (
+                          <div style={{ fontSize: '0.75rem', color: 'var(--danger)', fontWeight: '600' }}>
+                            Eliminated
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+
+              <button className="btn btn-primary" onClick={() => router.push('/lobby')} style={{ maxWidth: '320px', margin: '0 auto' }}>
                 Return to Lobby
               </button>
             </div>

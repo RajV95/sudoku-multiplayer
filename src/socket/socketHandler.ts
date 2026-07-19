@@ -258,12 +258,9 @@ export function initSocketIO(io: Server) {
                   completionTime: room.players[playerIndex].completionTime,
                 });
 
-                // Check if all players have completed or resigned
-                const activePlayers = room.players.filter((p) => !p.isResigned && !p.isFinished);
-                if (activePlayers.length === 0) {
-                  await finishGame(room, redis);
-                  return;
-                }
+                // First player completion immediately ends the match for everyone
+                await finishGame(room, redis);
+                return;
               }
 
               await redis.set(`room:${code}`, JSON.stringify(room));
