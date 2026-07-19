@@ -406,22 +406,6 @@ async function finishGame(room: RoomState, redis: any) {
 
     await connectToDatabase();
 
-    // Create match entry
-    const match = await Match.create({
-      roomCode: room.roomCode,
-      difficulty: room.difficulty,
-      players: room.players.map((p) => ({
-        userId: new mongoose.Types.ObjectId(p.userId),
-        username: p.username,
-        finished: p.isFinished,
-        completionTime: p.completionTime,
-        resigned: p.isResigned,
-      })),
-      winnerId: winner ? new mongoose.Types.ObjectId(winner.userId) : null,
-      startedAt: room.startTime ? new Date(room.startTime) : new Date(),
-      endedAt: new Date(),
-    });
-
     // Update Player Stats
     for (const p of room.players) {
       const isWinner = winner && winner.userId === p.userId;
@@ -445,7 +429,7 @@ async function finishGame(room: RoomState, redis: any) {
 
     // Broadcast finished status
     if (ioInstance) {
-      ioInstance.to(room.roomCode).emit('game_finished', match);
+      ioInstance.to(room.roomCode).emit('game_finished', { roomCode: room.roomCode });
     }
 
     // Remove room from Redis cache
