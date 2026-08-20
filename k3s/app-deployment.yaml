@@ -1,7 +1,13 @@
 apiVersion: v1
+kind: Namespace
+metadata:
+  name: sudoku
+---
+apiVersion: v1
 kind: Secret
 metadata:
   name: sudoku-secrets
+  namespace: sudoku
 type: Opaque
 stringData:
   jwt-secret: "change_me_to_a_secure_production_secret_key"
@@ -10,6 +16,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: sudoku-app-deployment
+  namespace: sudoku
   labels:
     app: sudoku-app
 spec:
@@ -24,8 +31,9 @@ spec:
     spec:
       containers:
         - name: sudoku-app
-          image: sudoku-multiplayer:latest  # Replace with actual registry image path if publishing
-          imagePullPolicy: IfNotPresent
+          # CRITICAL: Pointing to the image GitHub Actions builds
+          image: ghcr.io/rajv95/sudoku-multiplayer:latest 
+          imagePullPolicy: Always
           ports:
             - containerPort: 3000
           env:
@@ -54,6 +62,7 @@ apiVersion: v1
 kind: Service
 metadata:
   name: sudoku-app-service
+  namespace: sudoku
 spec:
   selector:
     app: sudoku-app

@@ -56,3 +56,33 @@ jobs:
           labels: ${{ steps.meta.outputs.labels }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
+
+  deploy:
+    name: Deploy to Oracle K3s Cluster
+    needs: build-and-push
+    runs-on: ubuntu-latest
+    if: github.event_name != 'pull_request'
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Copy K3s Manifests to VPS
+        uses: appleboy/scp-action@v0.1.7
+        with:
+          host: ${{ secrets.ORACLE_HOST_IP }}
+          username: ubuntu
+          key: ${{ secrets.ORACLE_SSH_KEY }}
+          source: "k3s/*"
+          target: "/home/ubuntu/deployments/sudoku-multiplayer"
+          strip_components: 0
+
+      - name: Apply Manifests and Restart Pods
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.ORACLE_HOST_IP }}
+          username: ubuntu
+          key: ${{ secrets.ORACLE_SSH_KEY }}
+          script: |
+            sudo k3s kubectl apply -f /home/ubuntu/deployments/sudoku-multiplayer/k3s/
+            sudo k3s kubectl rollout restart deployment/sudoku-app-deployment -n sudoku
