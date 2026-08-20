@@ -4,10 +4,11 @@ let socket: Socket | null = null;
 
 export function getSocket(): Socket {
   if (!socket) {
-    // Connect to the same host that serves the site
+    // Connect using WebSocket transport directly to avoid polling spam
     socket = io({
       autoConnect: false,
       reconnectionAttempts: 5,
+      transports: ['websocket'],
     });
   }
   return socket;
