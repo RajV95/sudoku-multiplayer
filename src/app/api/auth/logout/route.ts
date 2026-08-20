@@ -10,7 +10,7 @@ export async function POST() {
       name: 'token',
       value: '',
       httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
+      secure: false,
       sameSite: 'lax',
       path: '/',
       maxAge: 0, // expire instantly
