@@ -1,5 +1,5 @@
 # Stage 1: Build dependencies
-FROM node:20-alpine AS builder
+FROM node:20-bookworm-slim AS builder
 WORKDIR /app
 COPY package*.json ./
 RUN npm ci
@@ -7,7 +7,7 @@ COPY . .
 RUN npm run build
 
 # Stage 2: Production environment runner
-FROM node:20-alpine AS runner
+FROM node:20-bookworm-slim AS runner
 WORKDIR /app
 ENV NODE_ENV=production
 
@@ -23,7 +23,8 @@ COPY --from=builder /app/public ./public
 COPY --from=builder /app/src ./src
 
 # Install production dependencies and ts-node/typescript runtime deps
-RUN npm ci --only=production && \
+# Updated to omit=dev to clear the npm warning
+RUN npm ci --omit=dev && \
     npm install -g ts-node typescript tsconfig-paths
 
 EXPOSE 3000
