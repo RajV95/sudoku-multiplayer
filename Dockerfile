@@ -5,6 +5,7 @@ COPY package*.json ./
 RUN npm ci
 COPY . .
 RUN npm run build
+RUN npm prune --omit=dev
 
 # Stage 2: Production environment runner
 FROM node:20-alpine AS runner
@@ -21,10 +22,7 @@ COPY --from=builder /app/.next ./.next
 COPY --from=builder /app/public ./public
 # Copy source files because ts-node registers src/socket files at runtime
 COPY --from=builder /app/src ./src
-
-# Install production dependencies and ts-node/typescript runtime deps
-RUN npm ci --only=production && \
-    npm install -g ts-node typescript tsconfig-paths
+COPY --from=builder /app/node_modules ./node_modules
 
 EXPOSE 3000
 CMD ["node", "server.js"]
